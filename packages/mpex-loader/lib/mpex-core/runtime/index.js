@@ -31,11 +31,9 @@ function makeRender () {
 }
 function makeVueRuntime (options) {
   let rawScriptSrc = options.rawScriptSrc
-  let resolve = options.resolver
   let context = options.context
   let src = '\n'
   return new Promise((resolve, reject) => {
-    let route = []
     let requireComponents = {}
     async.waterfall([
       (callback) => {
