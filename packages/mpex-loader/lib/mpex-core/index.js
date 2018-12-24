@@ -1,10 +1,12 @@
 const path = require('path')
 const parse = require('./parser')
 const compiler = require('./compiler')
-const createRuntime = require('./runtime/js-runtime')
-const NormalizeOptions = require('../normalize-options')
+const createRuntime = require('./runtime')
+const NormalizeOptions = require('./normalize-options')
 
-function compile (loaderContext, content, fileName, options) {
+function compile (content, resourceInfo, options) {
+  let fileName = resourceInfo.fileName
+  let loaderContext = options.loaderContext
   let vueSfc
   let transpilerOptions
 
@@ -21,9 +23,11 @@ function compile (loaderContext, content, fileName, options) {
       options.jsonOptions = ret
     } catch (e) {}
 
-    delete vueSfc.json
-
     transpilerOptions = new NormalizeOptions(options)
+
+    if (transpilerOptions.mode === 'vue') {
+      delete vueSfc.json
+    }
 
     // inject js-runtime
     const selectorLoader = path.resolve(__dirname, 'selector')

@@ -5,7 +5,7 @@ class NormalizeOptions {
   constructor (options) {
     this._options = options
     this.type = options.type
-    this.mode = options.loaderOptions.mode || 'wx'
+    this.mode = options.mode || 'wx'
     this.components = this.createComponents()
   }
 

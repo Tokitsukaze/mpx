@@ -29,7 +29,7 @@ function makeRender () {
     }
   `
 }
-function createRuntime (options) {
+function makeVueRuntime (options) {
   let rawScriptSrc = options.rawScriptSrc
   let src = '\n'
 
@@ -55,9 +55,32 @@ function createRuntime (options) {
   }
 
   // components
-  let exportPrefix = options.mode === 'vue' ? 'export default ' : ''
-  src += `${exportPrefix}${runtime}(options, injectOptions)\n`
+  src += `export default ${runtime}(options, injectOptions)\n`
 
   return src
+}
+
+function makeMiniRuntime (options) {
+  let src = ''
+  let runtime = options.type === 'app' ? 'createApp' : 'createComponent'
+  let mode = options.mode || 'wx'
+  let runtimePackageName
+  if (mode === 'wx') {
+    runtimePackageName = 'core'
+  } else if (mode === 'ali') {
+    runtimePackageName = 'core-ant'
+  }
+  src += `import {${runtime}} from '@mpxjs/${runtimePackageName}'\n`
+  src += options.rawScriptSrc + '\n'
+  src += `${runtime}(options)`
+  return src
+}
+
+function createRuntime (options) {
+  if (options.mode === 'vue') {
+    return makeVueRuntime(options)
+  } else {
+    return makeMiniRuntime(options)
+  }
 }
 module.exports = createRuntime

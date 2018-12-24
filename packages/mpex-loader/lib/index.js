@@ -4,6 +4,11 @@ const mpex = require('./mpex-core')
 const hash = require('hash-sum')
 
 const hashKeys = []
+
+function mergeOption (loaderOptions, queryOptions) {
+  return Object.assign({}, queryOptions, loaderOptions)
+}
+
 module.exports = function (content) {
   let callback = this.async()
   const filePath = this.resourcePath
@@ -14,6 +19,7 @@ module.exports = function (content) {
 
   // loader options from webpack
   const options = loaderUtils.getOptions(this) || {}
+  const mergedOptions = mergeOption(options, queryObj)
   const rootResource = this._compilation.entries[0].resource
 
   // vue-loader会在资源query拼接自己的参数，这些参数不由用户拼接
@@ -28,16 +34,20 @@ module.exports = function (content) {
 
   let output = cache.getCache(hashName)
   if (!output) {
+    let type = filePath === rootResource ? 'app' : 'component'
+
     let transpilerOptions = {
-      userOptions: queryObj,
-      loaderOptions: options
+      loaderContext: this,
+      mode: mergeOption.mode,
+      type
     }
-    if (filePath === rootResource) {
-      transpilerOptions.type = 'app'
-    } else {
-      transpilerOptions.type = 'component'
+
+    let resourceInfo = {
+      filePath
     }
-    mpex.compile(this, content, filePath, transpilerOptions).then(result => {
+
+    // 配置、工具皆以参数传递给mpex-core，保持mpex-core与webpack相对独立
+    mpex.compile(content, resourceInfo, transpilerOptions).then(result => {
       cache.setCache(hashName, result)
       callback(null, result)
     }).catch(err => {
