@@ -4,8 +4,8 @@ const compiler = require('./compiler')
 const createRuntime = require('./runtime')
 const NormalizeOptions = require('./normalize-options')
 
-function compile (content, resourceInfo, options) {
-  let fileName = resourceInfo.fileName
+function compile (content, options) {
+  let filePath = options.loaderContext.resource
   let loaderContext = options.loaderContext
   let vueSfc
   let transpilerOptions
@@ -13,7 +13,7 @@ function compile (content, resourceInfo, options) {
   return Promise.resolve().then(() => {
     let runtimeFile = path.resolve(__dirname, './js-runtime.js')
     loaderContext.addDependency(runtimeFile)
-    let sfc = parse(content, fileName, {})
+    let sfc = parse(content, filePath, {})
 
     // 新建一个SFC，避免转vue操作中修改原始SFC
     vueSfc = Object.assign({}, sfc)
@@ -31,7 +31,7 @@ function compile (content, resourceInfo, options) {
 
     // inject js-runtime
     const selectorLoader = path.resolve(__dirname, 'selector')
-    let rawScriptSrc = `import options from '!!${selectorLoader}?type=script!${fileName}'`
+    let rawScriptSrc = `import options from '!!${selectorLoader}?type=script!${filePath}'`
     transpilerOptions.rawScriptSrc = rawScriptSrc
 
     return createRuntime(transpilerOptions)

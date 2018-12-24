@@ -6,6 +6,9 @@ class NormalizeOptions {
     this._options = options
     this.type = options.type
     this.mode = options.mode || 'wx'
+    this.context = options.loaderContext.context
+    this.resource = options.loaderContext.resource
+    this.resolve = options.resolve
     this.components = this.createComponents()
   }
 

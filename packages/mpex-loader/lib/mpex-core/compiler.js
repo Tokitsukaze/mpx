@@ -1225,7 +1225,7 @@ function serializeComponent (sfc) {
   function walkBlock (block) {
     let tag
     // json
-    if (block.type === 'script' || block.type === 'javascript/json') {
+    if (block.type === 'script' || block.type === 'application/json') {
       tag = 'script'
     } else {
       tag = block.type

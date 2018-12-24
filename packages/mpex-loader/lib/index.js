@@ -6,7 +6,7 @@ const hash = require('hash-sum')
 const hashKeys = []
 
 function mergeOption (loaderOptions, queryOptions) {
-  return Object.assign({}, queryOptions, loaderOptions)
+  return Object.assign({}, loaderOptions, queryOptions)
 }
 
 module.exports = function (content) {
@@ -38,16 +38,13 @@ module.exports = function (content) {
 
     let transpilerOptions = {
       loaderContext: this,
-      mode: mergeOption.mode,
+      mode: mergedOptions.mode,
+      resolve: this.resolve,
       type
     }
 
-    let resourceInfo = {
-      filePath
-    }
-
     // 配置、工具皆以参数传递给mpex-core，保持mpex-core与webpack相对独立
-    mpex.compile(content, resourceInfo, transpilerOptions).then(result => {
+    mpex.compile(content, transpilerOptions).then(result => {
       cache.setCache(hashName, result)
       callback(null, result)
     }).catch(err => {
