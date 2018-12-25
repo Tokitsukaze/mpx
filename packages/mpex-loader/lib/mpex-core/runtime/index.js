@@ -13,7 +13,14 @@ function makeRoutes (components) {
 }
 
 function makeComponents (components) {
-  return JSON.stringify(components)
+  let result = ''
+  result += '{'
+  let component = Object.keys(components).map(i => {
+    return i
+  }).join(',')
+  result += (component + '}')
+
+  return result
 }
 
 function makeRender () {
