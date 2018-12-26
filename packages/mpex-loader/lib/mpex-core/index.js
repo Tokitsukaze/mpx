@@ -3,6 +3,7 @@ const parse = require('./parser')
 const compiler = require('./compiler')
 const createRuntime = require('./runtime')
 const NormalizeOptions = require('./normalize-options')
+const loaderUtils = require('loader-utils')
 
 function compile (content, options) {
   let filePath = options.loaderContext.resource
@@ -24,6 +25,7 @@ function compile (content, options) {
     } catch (e) {}
 
     transpilerOptions = new NormalizeOptions(options)
+    transpilerOptions.loaderContext = loaderContext
 
     if (transpilerOptions.mode === 'vue') {
       delete vueSfc.json
@@ -31,7 +33,8 @@ function compile (content, options) {
 
     // inject js-runtime
     const selectorLoader = path.resolve(__dirname, 'selector')
-    let rawScriptSrc = `import options from '!!${selectorLoader}?type=script!${filePath}'`
+    const request = `!!${selectorLoader}?type=script!${filePath}`
+    let rawScriptSrc = 'import options from ' + loaderUtils.stringifyRequest(loaderContext, request)
     transpilerOptions.rawScriptSrc = rawScriptSrc
 
     return createRuntime(transpilerOptions)

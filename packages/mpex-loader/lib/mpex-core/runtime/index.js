@@ -1,4 +1,5 @@
-var async = require('async')
+const async = require('async')
+const loaderUtils = require('loader-utils')
 
 function makeRoutes (components) {
   let result = ''
@@ -59,7 +60,7 @@ function makeVueRuntime (options) {
       (callback) => {
         // import components
         for (let i in requireComponents) {
-          src += `import ${i} from '${requireComponents[i]}'\n`
+          src += `import ${i} from ${loaderUtils.stringifyRequest(options.loaderContext, requireComponents[i])}\n`
         }
 
         // runtime
